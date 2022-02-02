@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Messenger</title>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<body>
+<script>
+    function send_message() {
+        let name = $("#name").val();
+        let text = $("#text").val();
+        $.get("/send", { "name": name, "text": text }, (data) => {
+            if (data == "ERROR") {
+                alert("ERROR");
+            }
+        });
+    }
+    function load_data() {
+        $.get("/get_messages", (data) => {
+            $("#messages").empty();
+            var messages = data["messages"];
+            for(let i in messages) {
+                var name=messages[i]["name"];
+                var text=messages[i]["text"];
+                var time=messages[i]["time"];
+                var html = "<div> [<b>"+name+"</b>]: "+ text + " <i>" + time + "</i></div>";
+                $("#messages").append($(html));
+            }
+        });
+    }
+    $(() => {
+        $("#sendButton").on("click", (event) => {
+            send_message();
+            $("#text").val("");
+        });
+        setInterval(load_data, 1000);
+    });
+</script>
+<div id="messages"></div>
+<b>Ваше имя:</b>
+<input id="name" type="text" placeholder="Ваше имя"/>
+<input id="text" type="text" placeholder="Текст сообщения"/>
+<button id="sendButton">Отправить</button>
+
+</body>
+</html>
